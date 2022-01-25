@@ -32,12 +32,12 @@ type postgresRepository struct {
 var NotFoundErr = errors.New("user balance with specified id not found")
 
 func (r *postgresRepository) Get(ctx context.Context, balance UserBalance) (UserBalance, error) {
-	query := "SELECT * from balance WHERE user_id=$1"
+	query := "SELECT value from balance WHERE user_id=$1"
 	return r.get(ctx, balance, query)
 }
 
 func (r *postgresRepository) GetWithSpec(ctx context.Context, balance UserBalance, spec Specification) (UserBalance, error) {
-	query := "SELECT * from balance WHERE user_id=$1" + " " + spec.ToSQLClosure()
+	query := "SELECT value from balance WHERE user_id=$1" + " " + spec.ToSQLClosure()
 	return r.get(ctx, balance, query)
 }
 
