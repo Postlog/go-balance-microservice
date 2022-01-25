@@ -29,7 +29,7 @@ type postgresRepository struct {
 	db *database.Database
 }
 
-var NotFoundErr = errors.New("user balance with specified id not found")
+var NotFoundErr = errors.New("user with specified id not found")
 
 func (r *postgresRepository) Get(ctx context.Context, balance UserBalance) (UserBalance, error) {
 	query := "SELECT value from balance WHERE user_id=$1"
