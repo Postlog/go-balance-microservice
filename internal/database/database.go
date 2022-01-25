@@ -29,6 +29,10 @@ func (db *Database) executeTx(ctx context.Context) *sql.Tx {
 	return nil
 }
 
+func (db *Database) Ping(ctx context.Context) error{
+	return db.db.PingContext(ctx)
+}
+
 func (db *Database) Exec(ctx context.Context, query string, args ...interface{}) error {
 	if tx := db.executeTx(ctx); tx != nil {
 		_, err := tx.ExecContext(ctx, query, args...)
