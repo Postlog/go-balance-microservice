@@ -3,7 +3,6 @@ package currency
 import (
 	"context"
 	"github.com/postlog/go-balance-microservice/internal/errors"
-	"github.com/postlog/go-balance-microservice/internal/logger"
 	"strings"
 )
 
@@ -13,11 +12,10 @@ type Service interface {
 
 type service struct {
 	client ExchangeRatesClient
-	logger logger.Logger
 }
 
-func NewService(client ExchangeRatesClient, logger logger.Logger) Service {
-	return &service{client, logger}
+func NewService(client ExchangeRatesClient) Service {
+	return &service{client}
 }
 
 func (s *service) Convert(ctx context.Context, from, to string, amount float64) (float64, error) {

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	e "github.com/postlog/go-balance-microservice/internal/errors"
-	"github.com/postlog/go-balance-microservice/internal/logger"
 	"github.com/postlog/go-balance-microservice/internal/utils"
 	"net/http"
 	"strings"
@@ -21,17 +20,15 @@ type ExchangeRatesClient interface {
 type baseExchangesRatesClient struct {
 	BaseURL, apiKey string
 	HTTPClient      *http.Client
-	logger          logger.Logger
 }
 
-func NewClient(apikey string, timeout int64, logger logger.Logger) ExchangeRatesClient {
+func NewClient(apikey string, timeout int64) ExchangeRatesClient {
 	return &baseExchangesRatesClient{
 		BaseURL: BaseURLV1,
 		HTTPClient: &http.Client{
 			Timeout: time.Duration(timeout) * time.Millisecond,
 		},
 		apiKey: apikey,
-		logger: logger,
 	}
 }
 
