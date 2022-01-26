@@ -3,7 +3,9 @@ package database
 import (
 	"context"
 	"database/sql"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
+	"github.com/postlog/go-balance-microservice/internal/logger"
+	"github.com/qustavo/sqlhooks/v2"
 )
 
 type ctxKey string
@@ -14,27 +16,22 @@ type Database struct {
 	db *sql.DB
 }
 
-func New(url string) (*Database, error) {
-	db, err := sql.Open("postgres", url)
+func New(dsn string, logger logger.Logger) (*Database, error) {
+	sql.Register("psql", sqlhooks.Wrap(&pq.Driver{}, NewLogHook(logger)))
+	db, err := sql.Open("psql", dsn)
 	if err != nil {
 		return nil, err
 	}
+
 	return &Database{db}, nil
 }
 
-func (db *Database) executeTx(ctx context.Context) *sql.Tx {
-	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
-		return tx
-	}
-	return nil
-}
-
-func (db *Database) Ping(ctx context.Context) error{
+func (db *Database) Ping(ctx context.Context) error {
 	return db.db.PingContext(ctx)
 }
 
 func (db *Database) Exec(ctx context.Context, query string, args ...interface{}) error {
-	if tx := db.executeTx(ctx); tx != nil {
+	if tx := extractTx(ctx); tx != nil {
 		_, err := tx.ExecContext(ctx, query, args...)
 		return err
 	}
@@ -44,7 +41,7 @@ func (db *Database) Exec(ctx context.Context, query string, args ...interface{})
 }
 
 func (db *Database) Query(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
-	if tx := db.executeTx(ctx); tx != nil {
+	if tx := extractTx(ctx); tx != nil {
 		return tx.QueryContext(ctx, query, args...)
 	}
 
@@ -52,7 +49,7 @@ func (db *Database) Query(ctx context.Context, query string, args ...interface{}
 }
 
 func (db *Database) QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row {
-	if tx := db.executeTx(ctx); tx != nil {
+	if tx := extractTx(ctx); tx != nil {
 		return tx.QueryRowContext(ctx, query, args...)
 	}
 
@@ -72,4 +69,11 @@ func (db *Database) WithTransaction(ctx context.Context, level sql.IsolationLeve
 	}
 
 	return tx.Commit()
+}
+
+func extractTx(ctx context.Context) *sql.Tx {
+	if tx, ok := ctx.Value(txKey).(*sql.Tx); ok {
+		return tx
+	}
+	return nil
 }
