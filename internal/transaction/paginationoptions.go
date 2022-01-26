@@ -3,6 +3,7 @@ package transaction
 import (
 	"errors"
 	"fmt"
+	"github.com/postlog/go-balance-microservice/internal/utils"
 	"strconv"
 	"strings"
 )
@@ -11,72 +12,75 @@ type PaginationOptions struct {
 	orderBy, orderDirection, limit, offset string
 }
 
-type PaginationOption func(*PaginationOptions) error
-
-func NewPaginationOptions(opts ...PaginationOption) (*PaginationOptions, error) {
-	pg := &PaginationOptions{
+func NewPaginationOptions(limit, offset int, column, direction string) (*PaginationOptions, error) {
+	opts := &PaginationOptions{
 		orderBy:        "date",
 		orderDirection: "asc",
 		limit:          "NULL",
 		offset:         "0",
 	}
 
-	for _, opt := range opts {
-		err := opt(pg)
-		if err != nil {
-			return nil, err
-		}
+	err := opts.setOrdering(column)
+	if err != nil {
+		return nil, err
 	}
-	return pg, nil
+
+	err = opts.setOrderDirection(direction)
+	if err != nil {
+		return nil, err
+	}
+
+	err = opts.setLimit(limit)
+	if err != nil {
+		return nil, err
+	}
+
+	err = opts.setOffset(offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return opts, nil
+}
+
+func (o *PaginationOptions) setLimit(limit int) error {
+	if limit < 0 {
+		return errors.New("limit cannot be less than 0")
+	}
+
+	o.limit = strconv.Itoa(limit)
+	return nil
+}
+
+func (o *PaginationOptions) setOffset(offset int) error {
+	if offset < 0 {
+		return errors.New("offset cannot be less than 0")
+	}
+
+	o.offset = strconv.Itoa(offset)
+	return nil
+}
+
+func (o *PaginationOptions) setOrdering(column string) error {
+	column = strings.ToLower(column)
+	if !utils.StringInCollection(column, "amount", "date") {
+		return fmt.Errorf("column name must be equal \"amount\" or \"date\", not \"%s\"", column)
+	}
+
+	o.orderBy = column
+	return nil
+}
+
+func (o *PaginationOptions) setOrderDirection(direction string) error {
+	direction = strings.ToLower(direction)
+	if !utils.StringInCollection(direction, "desc", "asc") {
+		return fmt.Errorf("order direction must be equal \"asc\" or \"desc\", not \"%s\"", direction)
+	}
+
+	o.orderDirection = direction
+	return nil
 }
 
 func (o *PaginationOptions) ToSQLClosure() string {
-	orderClosure := ""
-	if o.orderBy != "" {
-		orderClosure = fmt.Sprintf("ORDER BY %s %s", o.orderBy, o.orderDirection)
-	}
-
-	return fmt.Sprintf("%s LIMIT %s OFFSET %s", orderClosure, o.limit, o.offset)
-}
-
-func WithOrdering(columnName string) PaginationOption {
-	columnName = strings.ToLower(columnName)
-	return func(pg *PaginationOptions) error {
-		if columnName != "amount" && columnName != "date" {
-			return fmt.Errorf("column name must be equal \"amount\" or \"date\", not \"%s\"", columnName)
-		}
-		pg.orderBy = columnName
-		return nil
-	}
-}
-
-func WithDirection(dir string) PaginationOption {
-	dir = strings.ToLower(dir)
-	return func(pg *PaginationOptions) error {
-		if dir != "asc" && dir != "desc" {
-			return fmt.Errorf("order direction must be equal \"asc\" or \"desc\", not \"%s\"", dir)
-		}
-		pg.orderDirection = dir
-		return nil
-	}
-}
-
-func WithLimit(limit int) PaginationOption {
-	return func(pg *PaginationOptions) error {
-		if limit < 0 {
-			return errors.New("limit cannot be less than 0")
-		}
-		pg.limit = strconv.Itoa(limit)
-		return nil
-	}
-}
-
-func WithOffset(offset int) PaginationOption {
-	return func(pg *PaginationOptions) error {
-		if offset < 0 {
-			return errors.New("offset cannot be less than 0")
-		}
-		pg.offset = strconv.Itoa(offset)
-		return nil
-	}
+	return fmt.Sprintf("ORDER BY %s %s LIMIT %s OFFSET %s", o.orderBy, o.orderDirection, o.limit, o.offset)
 }

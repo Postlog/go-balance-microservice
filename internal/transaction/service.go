@@ -44,23 +44,10 @@ func (s *service) CreateTransaction(ctx context.Context, senderId, receiverId uu
 }
 
 func (s *service) GetTransactions(ctx context.Context, userId uuid.UUID, limit, offset int, orderBy, orderDir string) ([]Transaction, error) {
-	var opts []PaginationOption
-	if limit >= 0 {
-		opts = append(opts, WithLimit(limit))
-	}
-	if offset >= 0 {
-		opts = append(opts, WithOffset(offset))
-	}
-	if orderBy != "" {
-		opts = append(opts, WithOrdering(orderBy))
-	}
-	if orderDir != "" {
-		opts = append(opts, WithDirection(orderDir))
-	}
-
-	pg, err := NewPaginationOptions(opts...)
+	opts, err := NewPaginationOptions(limit, offset, orderBy, orderDir)
 	if err != nil {
 		return nil, errors.NewArgumentError(err.Error())
 	}
-	return s.repo.Get(ctx, userId, pg)
+
+	return s.repo.Get(ctx, userId, opts)
 }
