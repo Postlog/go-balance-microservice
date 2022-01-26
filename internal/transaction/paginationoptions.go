@@ -20,27 +20,30 @@ func NewPaginationOptions(limit, offset int, column, direction string) (*Paginat
 		offset:         "0",
 	}
 
-	err := opts.setOrdering(column)
+	var err error
+	setError := func(someErr error) {
+		if someErr != nil {
+			err = someErr
+		}
+	}
+	if column != "" {
+		setError(opts.setOrdering(column))
+	}
+	if direction != "" {
+		setError(opts.setOrderDirection(direction))
+	}
+	if limit != 0 {
+		setError(opts.setLimit(limit))
+	}
+	if offset != 0 {
+		setError(opts.setOffset(offset))
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	err = opts.setOrderDirection(direction)
-	if err != nil {
-		return nil, err
-	}
-
-	err = opts.setLimit(limit)
-	if err != nil {
-		return nil, err
-	}
-
-	err = opts.setOffset(offset)
-	if err != nil {
-		return nil, err
-	}
-
-	return opts, nil
+	return opts, err
 }
 
 func (o *PaginationOptions) setLimit(limit int) error {
