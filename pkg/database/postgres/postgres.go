@@ -13,7 +13,7 @@ type postgres struct {
 	db *sql.DB
 }
 
-func NewPostgresDatabase(dsn string, logger logger.Logger) (*postgres, error) {
+func New(dsn string, logger logger.Logger) (*postgres, error) {
 	name := "postgresWithLogging"
 	sql.Register(name, sqlhooks.Wrap(&pq.Driver{}, &logHook{logger}))
 	db, err := sql.Open(name, dsn)

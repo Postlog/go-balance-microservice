@@ -17,6 +17,6 @@ type Database interface {
 	Close() error
 }
 
-func NewDatabase(dsn string, logger logger.Logger) (Database, error) {
-	return postgres.NewPostgresDatabase(dsn, logger)
+func New(dsn string, logger logger.Logger) (Database, error) {
+	return postgres.New(dsn, logger)
 }
