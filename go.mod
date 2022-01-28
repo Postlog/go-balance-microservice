@@ -7,6 +7,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gofiber/fiber/v2 v2.25.0
 	github.com/google/uuid v1.3.0
+	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.2
 	github.com/qustavo/sqlhooks/v2 v2.1.0
 	go.uber.org/zap v1.19.1
