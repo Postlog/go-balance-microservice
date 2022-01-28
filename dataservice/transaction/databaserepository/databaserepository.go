@@ -47,6 +47,7 @@ func (r *repository) Get(
 		}
 		return nil, err
 	}
+	defer rows.Close()
 
 	var transactions []models.Transaction
 
@@ -66,6 +67,7 @@ func (r *repository) Get(
 			SenderId: senderId, ReceiverId: receiverId, Amount: amount, Description: description, Date: date,
 		})
 	}
+
 
 	return transactions, nil
 }
