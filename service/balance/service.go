@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/postlog/go-balance-microservice/dataservice/balance"
-	error2 "github.com/postlog/go-balance-microservice/dataservice/balance/error"
+	balanceError "github.com/postlog/go-balance-microservice/dataservice/balance/error"
 	"github.com/postlog/go-balance-microservice/dataservice/models"
 	"github.com/postlog/go-balance-microservice/pkg/errors"
 )
@@ -27,8 +27,8 @@ type service struct {
 
 var (
 	AmountValueErr     = errors.NewArgumentError("amount cannot be less or equal to 0")
-	NotEnoughFoundsErr = errors.NewArgumentError("user has not enough money")
 	IdsAreEqualErr     = errors.NewArgumentError("sender id and receiver id are equal")
+	NotEnoughFoundsErr = errors.NewServiceError(1, "user has not enough money")
 )
 
 func (s *service) AddToBalance(ctx context.Context, userId uuid.UUID, amount float64) error {
@@ -39,7 +39,7 @@ func (s *service) AddToBalance(ctx context.Context, userId uuid.UUID, amount flo
 	return s.repo.Transaction(ctx, func(ctx context.Context) error {
 		b, err := s.repo.GetAndBlock(ctx, models.UserBalance{UserId: userId})
 		if err != nil {
-			if err == error2.NotFoundErr {
+			if err == balanceError.NotFoundErr {
 				return s.repo.Create(ctx, models.UserBalance{UserId: userId, Value: amount})
 			}
 			return err
@@ -58,8 +58,8 @@ func (s *service) ReduceBalance(ctx context.Context, userId uuid.UUID, amount fl
 	return s.repo.Transaction(ctx, func(ctx context.Context) error {
 		b, err := s.repo.GetAndBlock(ctx, models.UserBalance{UserId: userId})
 		if err != nil {
-			if err == error2.NotFoundErr {
-				return errors.NewArgumentError(err.Error())
+			if err == balanceError.NotFoundErr {
+				return NotEnoughFoundsErr
 			}
 			return err
 		}
@@ -85,7 +85,7 @@ func (s *service) TransferFounds(ctx context.Context, senderId, receiverId uuid.
 	return s.repo.Transaction(ctx, func(ctx context.Context) error {
 		senderBalance, err := s.repo.GetAndBlock(ctx, models.UserBalance{UserId: senderId})
 		if err != nil {
-			if err == error2.NotFoundErr {
+			if err == balanceError.NotFoundErr {
 				return errors.NewArgumentError(err.Error())
 			}
 			return err
@@ -96,7 +96,7 @@ func (s *service) TransferFounds(ctx context.Context, senderId, receiverId uuid.
 
 		receiverBalance, err := s.repo.GetAndBlock(ctx, models.UserBalance{UserId: receiverId})
 		if err != nil {
-			if err == error2.NotFoundErr {
+			if err == balanceError.NotFoundErr {
 				receiverBalance = models.UserBalance{UserId: receiverId, Value: 0}
 				err = s.repo.Create(ctx, receiverBalance)
 				if err != nil {
@@ -122,7 +122,7 @@ func (s *service) GetBalance(ctx context.Context, userId uuid.UUID) (models.User
 	b := models.UserBalance{UserId: userId}
 	b, err := s.repo.Get(ctx, b)
 	if err != nil {
-		if err == error2.NotFoundErr {
+		if err == balanceError.NotFoundErr {
 			b.Value = 0
 			return b, nil
 		}

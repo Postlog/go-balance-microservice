@@ -37,6 +37,6 @@ func (api *provider) getTransactions(c *fiber.Ctx) error {
 		return err
 	}
 
-	resp := protocol.Response{ErrorMessage: nil, Payload: bytes}
+	resp := protocol.Response{Error: nil, Payload: bytes}
 	return c.Status(fiber.StatusOK).JSON(resp)
 }

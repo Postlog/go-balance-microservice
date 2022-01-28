@@ -68,7 +68,6 @@ func (r *repository) Get(
 		})
 	}
 
-
 	return transactions, nil
 }
 

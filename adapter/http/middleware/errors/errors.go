@@ -9,7 +9,7 @@ import (
 	"runtime/debug"
 )
 
-// BuildHandler returns handler, that handle errors
+// BuildHandler returns handler, that handle error
 //
 // Handler newer returns an error
 func BuildHandler(logger logger.Logger) fiber.Handler {
@@ -28,8 +28,11 @@ func BuildHandler(logger logger.Logger) fiber.Handler {
 			if err == nil {
 				return
 			}
-			l.Errorf("unexpected error (%s)\n%s", err, debug.Stack())
+
 			resp, code := buildErrorResponse(err)
+			if code == fiber.StatusInternalServerError {
+				l.Errorf("unexpected error (%s)\n%s", err, debug.Stack())
+			}
 			if err = c.Status(code).JSON(resp); err != nil {
 				l.Errorf("failed to send error response: %s", err)
 			}
@@ -43,24 +46,28 @@ func BuildHandler(logger logger.Logger) fiber.Handler {
 // buildErrorResponse builds protocol.Response object, that contains information about provided error
 func buildErrorResponse(err error) (protocol.Response, int) {
 	var (
-		msg        string
+		errorResp  protocol.Error
 		statusCode int
 	)
 
 	switch typedErr := err.(type) {
 	case errors.ArgumentError:
-		msg = typedErr.Error()
+		errorResp.Message = typedErr.Error()
 		statusCode = fiber.StatusBadRequest
 		break
+	case errors.ServiceError:
+		errorResp.Message = typedErr.Error()
+		code := typedErr.GetCode()
+		errorResp.Code = &code
 	case *fiber.Error:
-		msg = typedErr.Message
+		errorResp.Message = typedErr.Error()
 		statusCode = typedErr.Code
 		break
 	default:
-		msg = "unexpected internal server error"
+		errorResp.Message = "unexpected internal server error"
 		statusCode = fiber.StatusInternalServerError
 		break
 	}
 
-	return protocol.Response{ErrorMessage: &msg, Payload: nil}, statusCode
+	return protocol.Response{Error: &errorResp, Payload: nil}, statusCode
 }

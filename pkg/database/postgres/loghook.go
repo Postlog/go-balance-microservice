@@ -20,6 +20,6 @@ func (h *logHook) After(ctx context.Context, query string, args ...interface{}) 
 }
 
 func (h *logHook) OnError(ctx context.Context, err error, query string, args ...interface{}) error {
-	h.logger.Errorf("ErrorMessage: %v, Query: `%s`, Args: `%q`, Took: %s", err, query, args, time.Since(ctx.Value("started").(time.Time)))
+	h.logger.Errorf("Error: %v, Query: `%s`, Args: `%q`, Took: %s", err, query, args, time.Since(ctx.Value("started").(time.Time)))
 	return err
 }

@@ -15,6 +15,24 @@ func (e ArgumentError) Error() string {
 	return e.message
 }
 
+// ServiceError represents an error related to unsuccessful completion
+type ServiceError struct {
+	code    int
+	message string
+}
+
+func NewServiceError(code int, message string) ServiceError {
+	return ServiceError{code, message}
+}
+
+func (e ServiceError) GetCode() int {
+	return e.code
+}
+
+func (e ServiceError) Error() string {
+	return e.message
+}
+
 // APIRequestError wrapper that returns generic error
 func APIRequestError(err error) error {
 	return fmt.Errorf("unexpected error during sending request: %s", err)

@@ -10,8 +10,13 @@ import (
 
 // Response represents the response to the client
 type Response struct {
-	ErrorMessage *string         `json:"errorMessage"`
-	Payload      json.RawMessage `json:"payload"`
+	Error   *Error          `json:"error"`
+	Payload json.RawMessage `json:"payload"`
+}
+
+type Error struct {
+	Message string `json:"message"`
+	Code    *int   `json:"code"`
 }
 
 type BalancePayload struct {
@@ -66,8 +71,7 @@ func (r *TransferFoundsRequest) Validate() error {
 //
 // Implements ValidatableRequest interface
 type GetBalanceRequest struct {
-	UserId   *uuid.UUID `json:"userId"` // required field
-	Currency string     `json:"currency"`
+	UserId *uuid.UUID `json:"userId"` // required field
 }
 
 func (r *GetBalanceRequest) Validate() error {
