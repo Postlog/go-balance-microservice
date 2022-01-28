@@ -8,10 +8,9 @@ import (
 
 // Config holds application configuration values
 type Config struct {
-	Address             string `env:"BALANCE_ADDRESS,required"`
-	DatabaseAddress     string `env:"BALANCE_DATABASE,required"`
-	ExchangeRatesAPIKey string `env:"BALANCE_ER_API,required"`
-	IsDev               bool   `env:"BALANCE_IS_DEV" envDefault:"false"`
+	Port string `env:"MICROSERVICE_PORT,required"`
+	DSN  string `env:"MICROSERVICE_DSN,required"`
+	ExchangeRatesAPIKey string `env:"MICROSERVICE_ER_API_KEY,required"`
 	ApiRequestTimeout   int64  `json:"apiRequestTimeout"`
 	BaseCurrency        string `json:"baseCurrency"`
 	Logger              json.RawMessage

@@ -35,7 +35,7 @@ func main() {
 		panic(fmt.Errorf("unable to configure logger: %v", err))
 	}
 
-	db, err := database.NewDatabase(cfg.DatabaseAddress, l)
+	db, err := database.New(cfg.DSN, l)
 	if err != nil {
 		panic(fmt.Errorf("unable to establish connection to databaserepository: %v", err))
 	}
@@ -43,8 +43,7 @@ func main() {
 	app := setupApplication(cfg, l, db)
 
 	shutdownCompleted := gracefulShutdown(app, l, db)
-
-	if err = app.Listen(cfg.Address); err != nil {
+	if err = app.Listen(":"+cfg.Port); err != nil {
 		l.Errorf("unexpected error during serving connections: %s", err)
 		return
 	}
