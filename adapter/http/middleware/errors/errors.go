@@ -28,7 +28,7 @@ func BuildHandler(logger logger.Logger) fiber.Handler {
 			if err == nil {
 				return
 			}
-
+			l.Errorf("unexpected error (%s)\n%s", err, debug.Stack())
 			resp, code := buildErrorResponse(err)
 			if err = c.Status(code).JSON(resp); err != nil {
 				l.Errorf("failed to send error response: %s", err)

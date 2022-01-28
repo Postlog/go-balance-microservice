@@ -3,13 +3,14 @@ package config
 import (
 	"encoding/json"
 	"github.com/caarlos0/env/v6"
+	"github.com/joho/godotenv"
 	"os"
 )
 
 // Config holds application configuration values
 type Config struct {
-	Port string `env:"MICROSERVICE_PORT,required"`
-	DSN  string `env:"MICROSERVICE_DSN,required"`
+	Port                string `env:"MICROSERVICE_PORT,required"`
+	DSN                 string `env:"MICROSERVICE_DSN,required"`
 	ExchangeRatesAPIKey string `env:"MICROSERVICE_ER_API_KEY,required"`
 	ApiRequestTimeout   int64  `json:"apiRequestTimeout"`
 	BaseCurrency        string `json:"baseCurrency"`
@@ -18,11 +19,16 @@ type Config struct {
 
 // Load loads configuration values from environment and JSON file, located on the provided path
 func Load(path string) (*Config, error) {
-	cfg := Config{}
-	if err := cfg.loadEnv(); err != nil {
+	err := godotenv.Load(".env")
+	if err != nil {
 		return nil, err
 	}
-	if err := cfg.loadJSON(path); err != nil {
+
+	cfg := Config{}
+	if err = cfg.loadEnv(); err != nil {
+		return nil, err
+	}
+	if err = cfg.loadJSON(path); err != nil {
 		return nil, err
 	}
 	return &cfg, nil

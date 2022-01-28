@@ -7,6 +7,6 @@ RUN go mod download
 RUN go mod verify
 
 COPY . .
-RUN go build -o server ./cmd/
+RUN go build -o server ./cmd/server
 
 CMD ["./server", "--config", "config/prod.json"]
