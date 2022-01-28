@@ -1,0 +1,23 @@
+{
+  "baseCurrency": "rub",
+  "apiRequestTimeout": 10000,
+  "logger": {
+    "level": "DEBUG",
+    "encoding": "console",
+    "errorOutputPaths": [
+      "stderr"
+    ],
+    "encoderConfig": {
+      "messageKey": "message",
+      "timeKey": "time",
+      "levelKey": "level",
+      "levelEncoder": "lowercase",
+      "timeEncoder": "RFC3339"
+    },
+    "outputPaths": [
+      "stdout",
+      "./logs/all.log"
+    ]
+  }
+}
+
