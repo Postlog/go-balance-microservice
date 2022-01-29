@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	currencyErrors "github.com/postlog/go-balance-microservice/dataservice/currency/errors"
 	e "github.com/postlog/go-balance-microservice/pkg/errors"
 	"github.com/postlog/go-balance-microservice/pkg/utils"
 	"net/http"
@@ -42,8 +43,6 @@ type ratesResponse struct {
 // GetRates fetches rates for provided currencies.
 //
 // If there is no provided currencies, method returns rates for all available currencies.
-//
-// If provided not supported currency, then its rate in returned map is equals to 0
 func (c *baseExchangesRatesClient) GetRates(ctx context.Context, currencies ...string) (map[string]float64, error) {
 	req, err := utils.PrepareGETRequest(ctx, c.BaseURL, "latest",
 		"access_key", c.apiKey,
@@ -54,16 +53,25 @@ func (c *baseExchangesRatesClient) GetRates(ctx context.Context, currencies ...s
 		return nil, err
 	}
 
-	var rates ratesResponse
-	err = c.sendRequest(req, &rates)
+	var ratesResp ratesResponse
+	err = c.sendRequest(req, &ratesResp)
 	if err != nil {
 		return nil, err
 	}
 
-	if !rates.Success {
+	if !ratesResp.Success {
 		return nil, errors.New("API request has not succeeded")
 	}
-	return rates.Rates, nil
+
+	rates := ratesResp.Rates
+
+	for _, currency := range currencies {
+		if rates[currency] == 0 {
+			return nil, currencyErrors.RateNotFoundErr
+		}
+	}
+
+	return rates, nil
 }
 
 func (c *baseExchangesRatesClient) sendRequest(req *http.Request, v interface{}) error {

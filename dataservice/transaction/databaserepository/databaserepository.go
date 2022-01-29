@@ -49,7 +49,7 @@ func (r *repository) Get(
 	}
 	defer rows.Close()
 
-	var transactions []models.Transaction
+	transactions := make([]models.Transaction, 0)
 
 	for rows.Next() {
 		var (
@@ -102,7 +102,7 @@ func convertToSQLClosure(limit, offset int, column, direction string) (string, e
 
 	direction = strings.ToLower(direction)
 	if direction != "" {
-		if !utils.StringInCollection(direction, "amount", "date") {
+		if !utils.StringInCollection(direction, "asc", "desc") {
 			return "", fmt.Errorf("order direction must be equal \"asc\" or \"desc\", not \"%s\"", direction)
 		}
 		o.orderDirection = direction

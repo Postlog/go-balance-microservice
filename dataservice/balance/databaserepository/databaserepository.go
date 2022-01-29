@@ -3,7 +3,7 @@ package databaserepository
 import (
 	"context"
 	"database/sql"
-	error2 "github.com/postlog/go-balance-microservice/dataservice/balance/error"
+	"github.com/postlog/go-balance-microservice/dataservice/balance/errors"
 	"github.com/postlog/go-balance-microservice/dataservice/models"
 	"github.com/postlog/go-balance-microservice/pkg/database"
 )
@@ -31,7 +31,7 @@ func (r *databaseRepository) get(ctx context.Context, b models.UserBalance, quer
 	err := r.db.QueryRow(ctx, query, b.UserId).Scan(&b.Value)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return b, error2.NotFoundErr
+			return b, errors.NotFoundErr
 		}
 		return b, err
 	}
