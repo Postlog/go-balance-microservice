@@ -30,7 +30,11 @@
     MICROSERVICE_PORT=<порт_на_котором_будут_прослушиваться_HTTP_подключения>
     MICROSERVICE_ER_API_KEY=<API_ключ_ExchangeRatesAPI>
     ```
-3. Для развертывания dev-среды:
+3. Создать папку для логов:
+    ```
+    mkdir logs
+    ```
+4. Для развертывания dev-среды:
 * Запустить контейнер с базой данных
     ```
     docker-compose up
@@ -39,7 +43,7 @@
     ```
     go run ./cmd/server/
     ```
-4. Для развертывания prod-среды:
+5. Для развертывания prod-среды:
 * Запустить контейнеры с базой данных и сервером
     ```
     docker-compose -f docker-compose.prod.yml up --build 
