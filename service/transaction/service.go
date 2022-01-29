@@ -44,10 +44,10 @@ func (s *service) GetTransactions(
 	count, startFrom int, orderBy, orderDirection string,
 ) ([]models.Transaction, error) {
 	if count < 0 {
-		return nil, errors.NewArgumentError("count cannot be less or equal than zero")
+		return nil, errors.NewArgumentError("count cannot be less or equal to zero")
 	}
 	if startFrom < 0 {
-		return nil, errors.NewArgumentError("start index cannot be less or equal than zero")
+		return nil, errors.NewArgumentError("start index cannot be less or equal to zero")
 	}
 	if orderBy != "" && !utils.StringInCollection(orderBy, "amount", "date") {
 		return nil, errors.NewArgumentError("ordering can only be done by fields \"amount\" and \"date\"")
