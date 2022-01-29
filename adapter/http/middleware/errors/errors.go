@@ -59,6 +59,8 @@ func buildErrorResponse(err error) (protocol.Response, int) {
 		errorResp.Message = typedErr.Error()
 		code := typedErr.GetCode()
 		errorResp.Code = &code
+		statusCode = fiber.StatusBadRequest
+		break
 	case *fiber.Error:
 		errorResp.Message = typedErr.Error()
 		statusCode = typedErr.Code

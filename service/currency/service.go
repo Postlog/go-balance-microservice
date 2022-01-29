@@ -3,7 +3,9 @@ package currency
 import (
 	"context"
 	"github.com/postlog/go-balance-microservice/dataservice/currency"
+	currencyErrors "github.com/postlog/go-balance-microservice/dataservice/currency/errors"
 	"github.com/postlog/go-balance-microservice/pkg/errors"
+	"github.com/postlog/go-balance-microservice/service/constants"
 	"strings"
 )
 
@@ -31,11 +33,10 @@ func (s *service) Convert(ctx context.Context, from, to string, amount float64) 
 
 	rates, err := s.client.GetRates(ctx, from, to)
 	if err != nil {
+		if err == currencyErrors.RateNotFoundErr {
+			return 0, errors.NewServiceError(constants.CurrencyNotSupportedErrCode, "specified currency not supported")
+		}
 		return 0, err
-	}
-
-	if rates[from] == 0 || rates[to] == 0 {
-		return 0, errors.NewArgumentError("specified currency not supported")
 	}
 
 	return (amount / rates[from]) * rates[to], nil

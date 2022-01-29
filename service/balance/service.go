@@ -4,9 +4,10 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/postlog/go-balance-microservice/dataservice/balance"
-	balanceError "github.com/postlog/go-balance-microservice/dataservice/balance/error"
+	balanceError "github.com/postlog/go-balance-microservice/dataservice/balance/errors"
 	"github.com/postlog/go-balance-microservice/dataservice/models"
 	"github.com/postlog/go-balance-microservice/pkg/errors"
+	"github.com/postlog/go-balance-microservice/service/constants"
 )
 
 // Service interface defines methods, that allows to manipulate with user balance
@@ -28,7 +29,7 @@ type service struct {
 var (
 	AmountValueErr     = errors.NewArgumentError("amount cannot be less or equal to 0")
 	IdsAreEqualErr     = errors.NewArgumentError("sender id and receiver id are equal")
-	NotEnoughFoundsErr = errors.NewServiceError(1, "user has not enough money")
+	NotEnoughFoundsErr = errors.NewServiceError(constants.NotEnoughFoundsErrCode, "user has not enough money")
 )
 
 func (s *service) AddToBalance(ctx context.Context, userId uuid.UUID, amount float64) error {
@@ -86,7 +87,7 @@ func (s *service) TransferFounds(ctx context.Context, senderId, receiverId uuid.
 		senderBalance, err := s.repo.GetAndBlock(ctx, models.UserBalance{UserId: senderId})
 		if err != nil {
 			if err == balanceError.NotFoundErr {
-				return errors.NewArgumentError(err.Error())
+				return NotEnoughFoundsErr
 			}
 			return err
 		}
