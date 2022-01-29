@@ -10,7 +10,7 @@ import (
 
 func Register(router fiber.Router, transactionService transaction.Service) {
 	api := provider{transactionService}
-	router.Post("list", api.getTransactions)
+	router.Post("get", api.getTransactions)
 }
 
 type provider struct {
