@@ -76,7 +76,7 @@ func setupApplication(cfg *config.Config, logger logger.Logger, db database.Data
 	app := fiber.New()
 	root := app.Group("")
 	balanceAPIRouter := root.Group("balance")
-	transactionAPIRouter := root.Group("transaction")
+	transactionAPIRouter := root.Group("transactions")
 
 	middleware.Register(root, logger)
 
