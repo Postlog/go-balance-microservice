@@ -8,6 +8,7 @@ import (
 	"github.com/postlog/go-balance-microservice/dataservice/models"
 	"github.com/postlog/go-balance-microservice/pkg/errors"
 	"github.com/postlog/go-balance-microservice/service/constants"
+	"math"
 )
 
 // Service interface defines methods, that allows to manipulate with user balance
@@ -66,6 +67,7 @@ func (s *service) ReduceBalance(ctx context.Context, userId uuid.UUID, amount fl
 			return err
 		}
 
+		amount = math.Round(amount*100)/100 // round to 2 decimal places
 		if b.Value < amount {
 			return NotEnoughFoundsErr
 		}
@@ -92,6 +94,8 @@ func (s *service) TransferFounds(ctx context.Context, senderId, receiverId uuid.
 			}
 			return err
 		}
+
+		amount = math.Round(amount*100)/100 // round to 2 decimal places
 		if senderBalance.Value < amount {
 			return NotEnoughFoundsErr
 		}
