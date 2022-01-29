@@ -18,6 +18,7 @@ type Service interface {
 	TransferFounds(ctx context.Context, senderId, receiverId uuid.UUID, amount float64) error
 }
 
+// NewService returns the service, that implements Service interface
 func NewService(repo balance.Repository) Service {
 	return &service{repo: repo}
 }

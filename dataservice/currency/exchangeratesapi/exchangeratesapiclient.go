@@ -14,13 +14,13 @@ import (
 
 const BaseURLV1 = "http://api.exchangeratesapi.io/v1"
 
-type baseExchangesRatesClient struct {
+type client struct {
 	BaseURL, apiKey string
 	HTTPClient      *http.Client
 }
 
-func NewBaseClient(apikey string, timeout int64) *baseExchangesRatesClient {
-	return &baseExchangesRatesClient{
+func NewClient(apikey string, timeout int64) *client {
+	return &client{
 		BaseURL: BaseURLV1,
 		HTTPClient: &http.Client{
 			Timeout: time.Duration(timeout) * time.Millisecond,
@@ -43,7 +43,7 @@ type ratesResponse struct {
 // GetRates fetches rates for provided currencies.
 //
 // If there is no provided currencies, method returns rates for all available currencies.
-func (c *baseExchangesRatesClient) GetRates(ctx context.Context, currencies ...string) (map[string]float64, error) {
+func (c *client) GetRates(ctx context.Context, currencies ...string) (map[string]float64, error) {
 	req, err := utils.PrepareGETRequest(ctx, c.BaseURL, "latest",
 		"access_key", c.apiKey,
 		"symbols", strings.Join(currencies, ","),
@@ -74,7 +74,7 @@ func (c *baseExchangesRatesClient) GetRates(ctx context.Context, currencies ...s
 	return rates, nil
 }
 
-func (c *baseExchangesRatesClient) sendRequest(req *http.Request, v interface{}) error {
+func (c *client) sendRequest(req *http.Request, v interface{}) error {
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 
 	resp, err := c.HTTPClient.Do(req)

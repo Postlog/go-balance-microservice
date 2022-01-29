@@ -14,21 +14,21 @@ import (
 	"time"
 )
 
-// repository implements Repository interface
-type repository struct {
+// databaseRepository implements transaction.Repository interface
+type databaseRepository struct {
 	db database.Database
 }
 
-func New(db database.Database) *repository {
-	return &repository{db}
+func New(db database.Database) *databaseRepository {
+	return &databaseRepository{db}
 }
 
-func (r *repository) Create(ctx context.Context, t models.Transaction) error {
+func (r *databaseRepository) Create(ctx context.Context, t models.Transaction) error {
 	query := "INSERT INTO transaction (sender_id, receiver_id, amount, description, date) VALUES ($1, $2, $3, $4, $5)"
 	return r.db.Exec(ctx, query, t.SenderId, t.ReceiverId, t.Amount, t.Description, t.Date)
 }
 
-func (r *repository) Get(
+func (r *databaseRepository) Get(
 	ctx context.Context,
 	userId uuid.UUID,
 	count, startFrom int, orderBy, orderDirection string,

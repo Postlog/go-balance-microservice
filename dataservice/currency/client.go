@@ -12,5 +12,5 @@ type Client interface {
 // NewClient returns the client, that implements Client interface
 // timeout - waiting time for a response from the API in milliseconds
 func NewClient(apikey string, timeout int64) Client {
-	return exchangeratesapi.NewBaseClient(apikey, timeout)
+	return exchangeratesapi.NewClient(apikey, timeout)
 }

@@ -12,7 +12,7 @@ import (
 type Repository interface {
 	// Get returns models.UserBalance for specified user
 	Get(ctx context.Context, balance models.UserBalance) (models.UserBalance, error)
-	// GetForUpdate returns models.UserBalance for specified user with lock for update
+	// GetAndBlock returns models.UserBalance for specified user with lock
 	//
 	// Makes sense only if called inside a transaction
 	GetAndBlock(ctx context.Context, balance models.UserBalance) (models.UserBalance, error)

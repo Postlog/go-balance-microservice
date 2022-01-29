@@ -15,6 +15,7 @@ type Service interface {
 	GetTransactions(ctx context.Context, userId uuid.UUID, limit, offset int, orderBy, orderDir string) ([]models.Transaction, error)
 }
 
+// NewService returns the service, that implements Service interface
 func NewService(repo transaction.Repository) Service {
 	return &service{repo: repo}
 }
