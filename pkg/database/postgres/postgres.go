@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/postlog/go-balance-microservice/pkg/logger"
 	"github.com/postlog/go-balance-microservice/pkg/types"
+	"github.com/postlog/go-balance-microservice/pkg/utils"
 	"github.com/qustavo/sqlhooks/v2"
 )
 
@@ -15,7 +16,10 @@ type postgres struct {
 
 func New(dsn string, logger logger.Logger) (*postgres, error) {
 	name := "postgresWithLogging"
-	sql.Register(name, sqlhooks.Wrap(&pq.Driver{}, &logHook{logger}))
+	if !utils.StringInCollection(name, sql.Drivers()...) {
+		sql.Register(name, sqlhooks.Wrap(&pq.Driver{}, &logHook{logger}))
+	}
+	
 	db, err := sql.Open(name, dsn)
 	if err != nil {
 		return nil, err
@@ -30,6 +34,10 @@ const txKey = ctxKey("transaction")
 
 func (pg *postgres) Close() error {
 	return pg.db.Close()
+}
+
+func (pg *postgres) Ping() error {
+	return pg.db.Ping()
 }
 
 func (pg *postgres) Exec(ctx context.Context, query string, args ...interface{}) error {

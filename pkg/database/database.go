@@ -14,6 +14,7 @@ type Database interface {
 	QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row
 	WithTransaction(ctx context.Context, level sql.IsolationLevel, f func(ctx context.Context) error) error
 	GetTransactionWrapper() types.TransactionWrapper
+	Ping() error
 	Close() error
 }
 

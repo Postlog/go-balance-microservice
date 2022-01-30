@@ -27,33 +27,35 @@ func main() {
 
 	cfg, err := config.Load(*configPath)
 	if err != nil {
-		panic(fmt.Errorf("unable to load config: %v", err))
+		panic(fmt.Errorf("unable to load config: %s", err))
 	}
 
 	l, err := logger.New(cfg.Logger)
 	if err != nil {
-		panic(fmt.Errorf("unable to configure logger: %v", err))
+		panic(fmt.Errorf("unable to configure logger: %s", err))
 	}
+	defer l.Flush()
 
 	db, err := database.New(cfg.DSN, l)
 	if err != nil {
-		panic(fmt.Errorf("unable to establish connection to databaserepository: %v", err))
+		panic(fmt.Errorf("unable to create new database: %s", err))
 	}
+	if err = db.Ping(); err != nil {
+		panic(fmt.Errorf("unable to esteblish connection to the database %s", err))
+	}
+	defer db.Close()
 
 	app := setupApplication(cfg, l, db)
 
-	shutdownCompleted := gracefulShutdown(app, l, db)
+	gracefulShutdown(app, l)
 	if err = app.Listen(":" + cfg.Port); err != nil {
 		l.Errorf("unexpected error during serving connections: %s", err)
 		return
 	}
-
-	<-shutdownCompleted
 }
 
-func gracefulShutdown(app *fiber.App, logger logger.Logger, db database.Database) <-chan struct{} {
+func gracefulShutdown(app *fiber.App, logger logger.Logger)  {
 	signals := make(chan os.Signal, 1)
-	completed := make(chan struct{}, 1)
 	signal.Notify(signals, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 
 	go func() {
@@ -61,15 +63,7 @@ func gracefulShutdown(app *fiber.App, logger logger.Logger, db database.Database
 		if err := app.Shutdown(); err != nil {
 			logger.Errorf("unexpected error during shutting down the server: %s", err)
 		}
-
-		if err := db.Close(); err != nil {
-			logger.Errorf("unexpected error during closing the database connections: %s", err)
-		}
-		logger.Infof("Application stopped")
-		_ = logger.Flush()
-		completed <- struct{}{}
 	}()
-	return completed
 }
 
 func setupApplication(cfg *config.Config, logger logger.Logger, db database.Database) *fiber.App {
