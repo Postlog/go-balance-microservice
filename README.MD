@@ -24,7 +24,7 @@
     POSTGRES_USER=<имя_пользователя_которое_будет_использовать_бд>
     POSTGRES_PASSWORD=<пароль_пользователя_бд>
     POSTGRES_DB=<имя_бд>
-    POSTGRES_PORT=<порт_который_будет_использовать_бд>
+    POSTGRES_PORT=<порт_для_внешних_покдлючений>
     
     MICROSERVICE_DSN="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
     MICROSERVICE_PORT=<порт_на_котором_будут_прослушиваться_HTTP_подключения>
