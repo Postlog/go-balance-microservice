@@ -5,15 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"path"
 )
 
-func PrepareGETRequest(ctx context.Context, baseURL, path string, params ...string) (*http.Request, error) {
+func PrepareGETRequest(ctx context.Context, baseURL, resourcePath string, params ...string) (*http.Request, error) {
 	if len(params)%2 != 0 {
 		return nil, errors.New("params must be key value pairs")
 	}
 
-	reqUrl := fmt.Sprintf("%s/%s", baseURL, path)
-	req, err := http.NewRequest("GET", reqUrl, nil)
+	parsedBaseURL, err := url.ParseRequestURI(baseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedPath, err := url.Parse(resourcePath)
+	if err != nil {
+		return nil, err
+	}
+
+	reqURL := fmt.Sprintf("%s://%s", parsedBaseURL.Scheme, path.Join(parsedBaseURL.Host, parsedPath.Path))
+
+	req, err := http.NewRequest("GET", reqURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -22,5 +35,6 @@ func PrepareGETRequest(ctx context.Context, baseURL, path string, params ...stri
 		q.Add(params[i], params[i+1])
 	}
 	req.URL.RawQuery = q.Encode()
+
 	return req.WithContext(ctx), nil
 }
