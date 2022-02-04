@@ -40,9 +40,6 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("unable to create new database: %s", err))
 	}
-	if err = db.Ping(); err != nil {
-		panic(fmt.Errorf("unable to esteblish connection to the database %s", err))
-	}
 	defer db.Close()
 
 	app := setupApplication(cfg, l, db)
