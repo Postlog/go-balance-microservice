@@ -21,7 +21,7 @@ services:
       - logs-volume:/app/logs/
     environment:
       MICROSERVICE_PORT: ${MICROSERVICE_PORT}
-      MICROSERVICE_DSN: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
+      MICROSERVICE_DSN: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
       MICROSERVICE_ER_API_KEY: ${MICROSERVICE_ER_API_KEY}
 volumes:
   database-volume:
