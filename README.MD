@@ -48,8 +48,7 @@
     ```
     docker-compose -f docker-compose.prod.yml up --build 
     ```
-
-SQL файл с созданием необходимых таблиц находится [тут](sql/tables.sql)
+6. Создать таблицы в базе данных, SQL файл с созданием необходимых таблиц находится [тут](sql/tables.sql)
 
 #### Описание API
 
