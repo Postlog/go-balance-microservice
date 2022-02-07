@@ -35,19 +35,19 @@
     mkdir logs
     ```
 4. Для развертывания dev-среды:
-* Запустить контейнер с базой данных
-    ```
-    docker-compose up
-    ```
-* Запустить сервер
-    ```
-    go run ./cmd/server/
-    ```
+   * Запустить контейнер с базой данных
+       ```
+       docker-compose up
+       ```
+   * Запустить сервер
+       ```
+       go run ./cmd/server/
+       ```
 5. Для развертывания prod-среды:
-* Запустить контейнеры с базой данных и сервером
-    ```
-    docker-compose -f docker-compose.prod.yml up --build 
-    ```
+   * Запустить контейнеры с базой данных и сервером
+       ```
+       docker-compose -f docker-compose.prod.yml up --build 
+       ```
 6. Создать таблицы в базе данных, SQL файл с созданием необходимых таблиц находится [тут](sql/tables.sql)
 
 #### Описание API
@@ -56,7 +56,7 @@
 * [Пополнить баланс пользователя](docs/addtobalance.md) (`POST balance/add`)
 * [Списать с баланса пользователя](docs/reducebalance.md) (`POST balance/reduce`)
 * [Перевести средства от одного пользователя к другому](docs/transferfounds.md) (`POST balance/transfer`)
-* [Получить историю транзакция](docs/gettransactions.md) (`POST transactions/get`)
+* [Получить историю транзакций](docs/gettransactions.md) (`POST transactions/get`)
 
 #### Детали реализации
 
